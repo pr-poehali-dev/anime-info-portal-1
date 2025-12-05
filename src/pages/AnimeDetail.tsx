@@ -5,6 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 
 interface Character {
@@ -95,9 +100,45 @@ const animeData: Record<string, any> = {
 const AnimeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isInList, setIsInList] = useState(false);
+  const [userReviews, setUserReviews] = useState<Review[]>([]);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const [newReview, setNewReview] = useState({ author: '', rating: 0, text: '' });
+  const [hoveredStar, setHoveredStar] = useState(0);
   
   const anime = animeData[id || '1'] || animeData['1'];
+  const allReviews = [...(anime.reviews || []), ...userReviews];
+
+  const handleSubmitReview = () => {
+    if (!newReview.author || !newReview.rating || !newReview.text) {
+      toast({
+        title: 'Заполните все поля',
+        description: 'Пожалуйста, укажите имя, оценку и текст рецензии',
+        variant: 'destructive'
+      });
+      return;
+    }
+    const review: Review = {
+      id: Date.now(),
+      author: newReview.author,
+      rating: newReview.rating,
+      date: new Date().toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }),
+      text: newReview.text,
+      helpful: 0
+    };
+    setUserReviews([review, ...userReviews]);
+    setNewReview({ author: '', rating: 0, text: '' });
+    setIsReviewDialogOpen(false);
+    toast({
+      title: 'Рецензия опубликована!',
+      description: 'Спасибо за ваше мнение'
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,7 +236,7 @@ const AnimeDetail = () => {
               <TabsList className="w-full justify-start">
                 <TabsTrigger value="overview">Обзор</TabsTrigger>
                 <TabsTrigger value="characters">Персонажи</TabsTrigger>
-                <TabsTrigger value="reviews">Рецензии ({anime.reviews?.length || 0})</TabsTrigger>
+                <TabsTrigger value="reviews">Рецензии ({allReviews.length})</TabsTrigger>
                 <TabsTrigger value="stats">Статистика</TabsTrigger>
               </TabsList>
 
@@ -269,16 +310,83 @@ const AnimeDetail = () => {
               </TabsContent>
 
               <TabsContent value="reviews" className="mt-6 space-y-4">
-                {anime.reviews && anime.reviews.length > 0 ? (
-                  <>
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl font-bold">Рецензии пользователей</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold">Рецензии пользователей</h3>
+                  <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
+                    <DialogTrigger asChild>
                       <Button>
                         <Icon name="Plus" size={16} className="mr-2" />
                         Написать рецензию
                       </Button>
-                    </div>
-                    {anime.reviews.map((review: Review) => (
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Написать рецензию на «{anime.title}»</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 mt-4">
+                        <div>
+                          <Label htmlFor="author">Ваше имя</Label>
+                          <Input
+                            id="author"
+                            placeholder="Введите ваше имя"
+                            value={newReview.author}
+                            onChange={(e) => setNewReview({ ...newReview, author: e.target.value })}
+                            className="mt-2"
+                          />
+                        </div>
+                        <div>
+                          <Label>Ваша оценка</Label>
+                          <div className="flex items-center gap-2 mt-2">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                className="transition-transform hover:scale-110"
+                                onMouseEnter={() => setHoveredStar(star)}
+                                onMouseLeave={() => setHoveredStar(0)}
+                                onClick={() => setNewReview({ ...newReview, rating: star })}
+                              >
+                                <Icon
+                                  name="Star"
+                                  size={24}
+                                  className={`${
+                                    star <= (hoveredStar || newReview.rating)
+                                      ? 'fill-yellow-400 text-yellow-400'
+                                      : 'text-gray-300'
+                                  }`}
+                                />
+                              </button>
+                            ))}
+                            <span className="ml-2 text-sm font-medium">
+                              {newReview.rating > 0 ? `${newReview.rating}/10` : 'Выберите оценку'}
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="review-text">Ваша рецензия</Label>
+                          <Textarea
+                            id="review-text"
+                            placeholder="Поделитесь своими впечатлениями..."
+                            value={newReview.text}
+                            onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+                            className="mt-2 min-h-32"
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setIsReviewDialogOpen(false)}>
+                            Отмена
+                          </Button>
+                          <Button onClick={handleSubmitReview}>
+                            Опубликовать
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                {allReviews.length > 0 ? (
+                  <>
+                    {allReviews.map((review: Review) => (
                       <Card key={review.id}>
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between mb-3">
@@ -308,19 +416,7 @@ const AnimeDetail = () => {
                       </Card>
                     ))}
                   </>
-                ) : (
-                  <Card>
-                    <CardContent className="p-12 text-center">
-                      <Icon name="MessageSquare" size={48} className="mx-auto mb-4 text-muted-foreground" />
-                      <h3 className="text-xl font-semibold mb-2">Рецензий пока нет</h3>
-                      <p className="text-muted-foreground mb-4">Будьте первым, кто напишет рецензию!</p>
-                      <Button>
-                        <Icon name="Plus" size={16} className="mr-2" />
-                        Написать первую рецензию
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
+                ) : null}
               </TabsContent>
 
               <TabsContent value="stats" className="mt-6">
