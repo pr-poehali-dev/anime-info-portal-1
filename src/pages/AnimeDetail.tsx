@@ -148,7 +148,7 @@ const AnimeDetail = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
               <Icon name="ArrowLeft" size={20} />
             </Button>
-            <h1 className="text-2xl font-bold text-primary">AnimeHub</h1>
+            <h1 className="text-2xl font-bold text-primary">AbricosAnime</h1>
           </div>
         </div>
       </header>

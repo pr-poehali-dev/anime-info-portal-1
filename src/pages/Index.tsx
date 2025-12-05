@@ -115,7 +115,7 @@ const Index = () => {
       <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-primary">AnimeHub</h1>
+            <h1 className="text-3xl font-bold text-primary">AbricosAnime</h1>
             <nav className="flex gap-6">
               <Button variant="ghost" onClick={() => setSelectedTab('catalog')}>
                 <Icon name="Grid3x3" className="mr-2" size={18} />
@@ -350,7 +350,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h4 className="font-bold text-lg mb-3">AnimeHub</h4>
+              <h4 className="font-bold text-lg mb-3">AbricosAnime</h4>
               <p className="text-sm text-muted-foreground">Ваш гид в мире аниме</p>
             </div>
             <div>
