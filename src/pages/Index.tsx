@@ -334,7 +334,7 @@ const Index = () => {
             Создайте свой список аниме и получайте персональные рекомендации на основе ваших предпочтений
           </p>
           <div className="flex gap-3 justify-center">
-            <Button size="lg" className="gap-2">
+            <Button size="lg" className="gap-2" onClick={() => navigate('/auth')}>
               <Icon name="UserPlus" size={18} />
               Создать аккаунт
             </Button>
