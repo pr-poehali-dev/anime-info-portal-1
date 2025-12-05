@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -94,6 +95,7 @@ const news = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState('catalog');
@@ -169,7 +171,7 @@ const Index = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {popularAnime.map((anime, index) => (
-                  <Card key={anime.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 animate-scale-in" style={{ animationDelay: `${index * 100}ms` }}>
+                  <Card key={anime.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 animate-scale-in cursor-pointer" style={{ animationDelay: `${index * 100}ms` }} onClick={() => navigate(`/anime/${anime.id}`)}>
                     <div className="h-48 relative" style={{ backgroundColor: anime.imageColor }}>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute top-4 right-4">
@@ -222,7 +224,7 @@ const Index = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAnime.map((anime) => (
-                  <Card key={anime.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <Card key={anime.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer" onClick={() => navigate(`/anime/${anime.id}`)}>
                     <div className="h-40 relative" style={{ backgroundColor: anime.imageColor }}>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute top-3 right-3">
@@ -289,7 +291,7 @@ const Index = () => {
               <h3 className="text-2xl font-bold mb-6">Популярные рецензии</h3>
               <div className="space-y-4">
                 {mockAnime.slice(0, 4).map((anime) => (
-                  <Card key={anime.id} className="group hover:shadow-lg transition-all duration-300">
+                  <Card key={anime.id} className="group hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => navigate(`/anime/${anime.id}`)}>
                     <CardContent className="p-6">
                       <div className="flex gap-4">
                         <div className="w-20 h-28 rounded-lg flex-shrink-0" style={{ backgroundColor: anime.imageColor }} />
